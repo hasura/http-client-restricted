@@ -1,0 +1,5 @@
+http-client-restricted (0.0.1) unstable; urgency=medium
+
+  * Initial release.
+
+ -- Joey Hess <id@joeyh.name>  Sun, 24 Jun 2018 13:30:33 -0400
