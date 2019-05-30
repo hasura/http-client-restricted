@@ -6,6 +6,7 @@
 
 module Network.HTTP.Client.Restricted (
 	Restriction,
+	checkAddressRestriction,
 	addressRestriction,
 	mkRestrictedManagerSettings,
 	ConnectionRestricted(..),
@@ -36,7 +37,7 @@ import Prelude
 -- | Configuration of which HTTP connections to allow and which to
 -- restrict.
 data Restriction = Restriction
-	{ _addressRestriction :: AddrInfo -> Maybe ConnectionRestricted
+	{ checkAddressRestriction :: AddrInfo -> Maybe ConnectionRestricted
 	}
 
 -- | Decide if a HTTP connection is allowed based on the IP address
@@ -53,18 +54,18 @@ data Restriction = Restriction
 -- >			("blocked connection to private IP address " ++)
 -- > 		else Nothing
 addressRestriction :: (AddrInfo -> Maybe ConnectionRestricted) -> Restriction
-addressRestriction f = mempty { _addressRestriction = f }
+addressRestriction f = mempty { checkAddressRestriction = f }
 
 appendRestrictions :: Restriction -> Restriction -> Restriction
 appendRestrictions a b = Restriction
-	{ _addressRestriction = \addr ->
-		_addressRestriction a addr <|> _addressRestriction b addr
+	{ checkAddressRestriction = \addr ->
+		checkAddressRestriction a addr <|> checkAddressRestriction b addr
 	}
 
 -- | mempty does not restrict HTTP connections in any way
 instance Monoid Restriction where
 	mempty = Restriction
-		{ _addressRestriction = \_ -> Nothing
+		{ checkAddressRestriction = \_ -> Nothing
 		}
 #if MIN_VERSION_base(4,11,0)
 #elif MIN_VERSION_base(4,9,0)
@@ -202,7 +203,7 @@ restrictProxy cfg base = do
 			return $ proxy $ f $ dummyreq https
 	
 	mkproxy Nothing = (noProxy, Nothing)
-	mkproxy (Just proxyaddr) = case _addressRestriction cfg proxyaddr of
+	mkproxy (Just proxyaddr) = case checkAddressRestriction cfg proxyaddr of
 		Nothing -> (addrtoproxy (addrAddress proxyaddr), Nothing)
 		Just _ -> (noProxy, Just ProxyRestricted)
 	
@@ -282,7 +283,7 @@ getConnection cfg tls mcontext = do
 			close
 			(\sock -> NC.connectFromSocket context sock connparams)
 	  where
-		tryToConnect addr = case _addressRestriction cfg addr of
+		tryToConnect addr = case checkAddressRestriction cfg addr of
 			Nothing -> bracketOnError
 				(socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr))
 				close
