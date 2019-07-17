@@ -1,5 +1,5 @@
 Name: http-client-restricted
-Version: 0.0.1
+Version: 0.2.0
 Cabal-Version: >= 1.6
 Maintainer: Joey Hess <id@joeyh.name>
 Author: Joey Hess
@@ -25,8 +25,8 @@ Library
   Exposed-Modules:
     Network.HTTP.Client.Restricted
   Build-Depends: 
-      base >= 4.6 && < 5
-    , http-client >= 0.4.31 && < 0.6
+      base >= 4.11.1.0 && < 5.0
+    , http-client >= 0.5 && < 0.6
     , http-client-tls >= 0.3.2 && < 0.4
     , connection >= 0.2.5
     , data-default

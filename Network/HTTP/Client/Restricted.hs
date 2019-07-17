@@ -2,7 +2,6 @@
  -}
 
 {-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable, LambdaCase, PatternGuards #-}
-{-# LANGUAGE CPP #-}
 
 module Network.HTTP.Client.Restricted (
 	Restriction,
@@ -27,9 +26,7 @@ import qualified Data.ByteString.UTF8 as BU
 import Data.Maybe
 import Data.Default
 import Data.Typeable
-#if MIN_VERSION_base(4,9,0)
 import qualified Data.Semigroup as Sem
-#endif
 import Data.Monoid
 import Control.Applicative
 import Prelude
@@ -67,17 +64,9 @@ instance Monoid Restriction where
 	mempty = Restriction
 		{ checkAddressRestriction = \_ -> Nothing
 		}
-#if MIN_VERSION_base(4,11,0)
-#elif MIN_VERSION_base(4,9,0)
-	mappend = (Sem.<>)
-#else
-	mappend = appendRestrictions
-#endif
 
-#if MIN_VERSION_base(4,9,0)
 instance Sem.Semigroup Restriction where
 	(<>) = appendRestrictions
-#endif
 
 -- | Value indicating that a connection was restricted, and giving the
 -- reason why.
@@ -118,11 +107,7 @@ restrictManagerSettings
 restrictManagerSettings mcontext mtls cfg base = restrictProxy cfg $ base
 	{ managerRawConnection = restrictedRawConnection cfg
 	, managerTlsConnection = restrictedTlsConnection mcontext mtls cfg
-#if MIN_VERSION_http_client(0,5,0)
 	, managerWrapException = wrapOurExceptions base
-#else
-	, managerWrapIOException = wrapOurExceptions base
-#endif
 	}
 
 -- | Makes a TLS-capable ManagerSettings with a Restriction applied to it.
@@ -217,7 +202,6 @@ restrictProxy cfg base = do
 			, proxyPort = fromIntegral pn
 			}
 
-#if MIN_VERSION_http_client(0,5,0)
 wrapOurExceptions :: ManagerSettings -> Request -> IO a -> IO a
 wrapOurExceptions base req a =
 	let wrapper se
@@ -226,18 +210,6 @@ wrapOurExceptions base req a =
 				InternalException se
 		| otherwise = se
 	 in managerWrapException base req (handle (throwIO . wrapper) a)
-#else
-wrapOurExceptions :: ManagerSettings -> IO a -> IO a
-wrapOurExceptions base a =
-	let wrapper se = case fromException se of
-		Just (_ :: ConnectionRestricted) ->
-			-- Not really a TLS exception, but there is no
-			-- way to put SomeException in the 
-			-- InternalIOException this old version uses.
-			toException $ TlsException se
-		Nothing -> se
-	in managerWrapIOException base (handle (throwIO . wrapper) a)
-#endif
 
 restrictedRawConnection :: Restriction -> IO (Maybe HostAddress -> String -> Int -> IO Connection)
 restrictedRawConnection cfg = getConnection cfg Nothing Nothing
