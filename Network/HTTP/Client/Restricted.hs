@@ -88,7 +88,9 @@ connectionRestricted mkmessage =
 data ProxyRestricted = ProxyRestricted
 	deriving (Show)
 
--- Adjusts a ManagerSettings to enforce a Restriction.
+-- Adjusts a ManagerSettings to enforce a Restriction. The restriction
+-- will be checked each time a Request is made, and for each redirect
+-- followed.
 --
 -- This overrides the `managerRawConnection`
 -- and `managerTlsConnection` with its own implementations that check 
@@ -98,6 +100,9 @@ data ProxyRestricted = ProxyRestricted
 -- This function is not exported, because using it with a ManagerSettings
 -- produced by something other than http-client-tls would result in
 -- surprising behavior, since its connection methods would not be used.
+--
+-- The http proxy is also checked against the Restriction, and if
+-- access to it is blocked, the http proxy will not be used.
 restrictManagerSettings
 	:: Maybe NC.ConnectionContext
 	-> Maybe NC.TLSSettings
