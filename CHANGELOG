@@ -1,10 +1,10 @@
-http-client-restricted (0.2.0) UNRELEASED; urgency=medium
+http-client-restricted (0.0.2) unstable; urgency=medium
 
   * Added checkAddressRestriction.
   * Drop support for building with ghc older than 8.4.4.
   * Drop support for http-client 0.4.x.
 
- -- Joey Hess <id@joeyh.name>  Thu, 30 May 2019 14:52:19 -0400
+ -- Joey Hess <id@joeyh.name>  Tue, 25 Feb 2020 14:48:41 -0400
 
 http-client-restricted (0.0.1) unstable; urgency=medium
 
