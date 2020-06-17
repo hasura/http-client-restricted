@@ -1,3 +1,10 @@
+http-client-restricted (0.0.3) UNRELEASED; urgency=medium
+
+  * Update to http-client 0.6.
+  * Update to network-3.0.0.0, which split out network-bsd.
+
+ -- Joey Hess <id@joeyh.name>  Tue, 25 Feb 2020 14:50:11 -0400
+
 http-client-restricted (0.0.2) unstable; urgency=medium
 
   * Added checkAddressRestriction.
