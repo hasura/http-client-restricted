@@ -1,4 +1,10 @@
 {- | Restricted `ManagerSettings` for <https://haskell-lang.org/library/http-client>
+ -
+ - Copyright 2018 Joey Hess <id@joeyh.name>
+ -
+ - Portions from http-client-tls Copyright (c) 2013 Michael Snoyman
+ -
+ - License: MIT
  -}
 
 {-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable, LambdaCase, PatternGuards #-}
@@ -15,8 +21,7 @@ module Network.HTTP.Client.Restricted (
 ) where
 
 import Network.HTTP.Client
-import Network.HTTP.Client.Internal
-	(ManagerSettings(..), Connection, runProxyOverride, makeConnection)
+import Network.HTTP.Client.Internal (ManagerSettings(..), Connection, runProxyOverride)
 import Network.HTTP.Client.TLS (mkManagerSettingsContext)
 import Network.Socket
 import Network.BSD (getProtocolNumber)
