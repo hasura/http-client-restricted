@@ -247,7 +247,7 @@ getConnection cfg tls mcontext = do
    where
 	go context h p = do
 		let connparams = NC.ConnectionParams
-			{ NC.connectionHostname = h
+			{ NC.connectionHostname = hstripped
 			, NC.connectionPort = fromIntegral p
 			, NC.connectionUseSecure = tls
 			, NC.connectionUseSocks = Nothing -- unsupprted
@@ -259,19 +259,20 @@ getConnection cfg tls mcontext = do
 			, addrProtocol = proto
 			, addrSocketType = Stream
 			}
-		addrs <- getAddrInfo (Just hints) (Just h) (Just serv)
+		addrs <- getAddrInfo (Just hints) (Just hstripped) (Just serv)
 		bracketOnError
 			(firstSuccessful $ map tryToConnect addrs)
 			close
 			(\sock -> NC.connectFromSocket context sock connparams)
 	  where
+		hstripped = strippedHostName h -- strip brackets of raw IPv6 hosts
 		tryToConnect addr = case checkAddressRestriction cfg addr of
 			Nothing -> bracketOnError
 				(socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr))
 				close
 				(\sock -> connect sock (addrAddress addr) >> return sock)
 			Just r -> throwIO r
-		firstSuccessful [] = throwIO $ NC.HostNotResolved h
+		firstSuccessful [] = throwIO $ NC.HostNotResolved hstripped
 		firstSuccessful (a:as) = a `catch` \(e ::IOException) ->
 			case as of
 				[] -> throwIO e
