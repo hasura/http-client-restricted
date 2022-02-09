@@ -27,8 +27,8 @@ Library
     Network.HTTP.Client.Restricted
   Build-Depends: 
       base >= 4.11.1.0 && < 5.0
-    , http-client >= 0.7 && < 0.8
-    , http-client-tls >= 0.3.2 && < 0.4
+    , http-client >= 0.7.11 && < 0.8
+    , http-client-tls >= 0.3.6 && < 0.4
     , connection >= 0.2.5
     , data-default
     , network (>= 3.0.0.0)
